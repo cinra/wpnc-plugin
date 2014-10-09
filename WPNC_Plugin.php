@@ -3,137 +3,153 @@
 
 include_once('WPNC_LifeCycle.php');
 
-class WPNC_Plugin extends WPNC_LifeCycle {
+class WPNC_Plugin extends WPNC_LifeCycle
+{
 
-    /**
-     * See: http://plugin.michael-simpson.com/?page_id=31
-     * @return array of option meta data.
-     */
-    public function getOptionMetaData() {
-        //  http://plugin.michael-simpson.com/?page_id=31
-		$categories = array(); // TODO: get list of categories
-        $return_value = array(
-            //'_version' => array('Installed Version'), // Leave this one commented-out. Uncomment to test upgrades.
-            'EndPointURI' 	=> array(__('APIエンドポイントURI', 'wpnc-notification-center')),
-            'APIKey' 		=> array(__('API Key', 'wpnc-notification-center')),
-            'User' 			=> array(__('割当ユーザ', 'wpnc-notification-center')),
-            'Category' 		=> array(__('割当カテゴリ', 'wpnc-notification-center')),
-        );
-
-		$users = get_users(array());
-		foreach ($users as $user) {
-			$return_value['User'][] = array('name' => $user->user_login, 'value' => $user->ID);
-		}
-
-		$categories = get_categories('hide_empty=0');
-		foreach ($categories as $category) {
-			$return_value['Category'][] = array('name' => $category->name, 'value' => $category->term_id);
-		}
-
-		return $return_value;
+  public function getOptionMetaData()
+  {
+    
+    $categories = array(); // TODO: get list of categories
+    
+    $return_value = array(
+      //'_version' => array('Installed Version'), // Leave this one commented-out. Uncomment to test upgrades.
+      'EndPointURI' 	=> array(__('APIエンドポイントURI', 'wpnc-notification-center')),
+      'APIKey' 		=> array(__('API Key', 'wpnc-notification-center')),
+      'User' 			=> array(__('割当ユーザ', 'wpnc-notification-center')),
+      'Category' 		=> array(__('割当カテゴリ', 'wpnc-notification-center')),
+    );
+    
+    $users = get_users(array());
+    
+    foreach ($users as $user)
+    {
+      $return_value['User'][] = array('name' => $user->user_login, 'value' => $user->ID);
     }
+    
+    $categories = get_categories('hide_empty=0');
+    foreach ($categories as $category)
+    {
+      $return_value['Category'][] = array('name' => $category->name, 'value' => $category->term_id);
+    }
+    
+    return $return_value;
+  
+  }
 
 //    protected function getOptionValueI18nString($optionValue) {
 //        $i18nValue = parent::getOptionValueI18nString($optionValue);
 //        return $i18nValue;
 //    }
 
-    protected function initOptions() {
-        $options = $this->getOptionMetaData();
-        if (!empty($options)) {
-            foreach ($options as $key => $arr) {
-                if (is_array($arr) && count($arr > 1)) {
-                    $this->addOption($key, $arr[1]);
-                }
-            }
-        }
+  protected function initOptions()
+  {
+    
+    $options = $this->getOptionMetaData();
+    
+    if (!empty($options))
+    {
+      foreach ($options as $key => $arr)
+      {
+        if (is_array($arr) && count($arr > 1)) $this->addOption($key, $arr[1]);
+      }
     }
+    
+  }
 
-    public function getPluginDisplayName() {
-        return 'wp-notification-center';
-    }
+  public function getPluginDisplayName()
+  {
+    return __('WP Notification Center');
+  }
 
-    protected function getMainPluginFileName() {
-        return 'wp-notification-center.php';
-    }
+  protected function getMainPluginFileName()
+  {
+    return 'wp-notification-center.php';
+  }
 
-    /**
-     * See: http://plugin.michael-simpson.com/?page_id=101
-     * Called by install() to create any database tables if needed.
-     * Best Practice:
-     * (1) Prefix all table names with $wpdb->prefix
-     * (2) make table names lower case only
-     * @return void
-     */
-    protected function installDatabaseTables() {
+  /**
+   * See: http://plugin.michael-simpson.com/?page_id=101
+   * Called by install() to create any database tables if needed.
+   * Best Practice:
+   * (1) Prefix all table names with $wpdb->prefix
+   * (2) make table names lower case only
+   * @return void
+   */
+  protected function installDatabaseTables()
+  {
         //        global $wpdb;
         //        $tableName = $this->prefixTableName('mytable');
         //        $wpdb->query("CREATE TABLE IF NOT EXISTS `$tableName` (
         //            `id` INTEGER NOT NULL");
 		parent::installDatabaseTables();
-    }
+  }
 
-    /**
-     * See: http://plugin.michael-simpson.com/?page_id=101
-     * Drop plugin-created tables on uninstall.
-     * @return void
-     */
-    protected function unInstallDatabaseTables() {
-        //        global $wpdb;
-        //        $tableName = $this->prefixTableName('mytable');
-        //        $wpdb->query("DROP TABLE IF EXISTS `$tableName`");
-		parent::unInstallDatabaseTables();
-    }
+  /**
+   * See: http://plugin.michael-simpson.com/?page_id=101
+   * Drop plugin-created tables on uninstall.
+   * @return void
+   */
+  protected function unInstallDatabaseTables()
+  {
+      //        global $wpdb;
+      //        $tableName = $this->prefixTableName('mytable');
+      //        $wpdb->query("DROP TABLE IF EXISTS `$tableName`");
+    parent::unInstallDatabaseTables();
+  }
 
 
-    /**
-     * Perform actions when upgrading from version X to version Y
-     * See: http://plugin.michael-simpson.com/?page_id=35
-     * @return void
-     */
-    public function upgrade() {
-		parent::upgrade();
-    }
+  /**
+   * Perform actions when upgrading from version X to version Y
+   * See: http://plugin.michael-simpson.com/?page_id=35
+   * @return void
+   */
+  public function upgrade()
+  {
+  	parent::upgrade();
+  }
 
-	public function uninstall() {
+	public function uninstall()
+	{
 		parent::uninstall();
 	}
 
-    public function addActionsAndFilters() {
+  public function addActionsAndFilters()
+  {
 
-        // Add options administration page
-        // http://plugin.michael-simpson.com/?page_id=47
-        add_action('admin_menu', array(&$this, 'addSettingsSubMenuPage'));
-/*		add_action('admin_menu', array(&$this, 'addNotificationsOutToSubMenuPage'));
-		add_action('admin_menu', array(&$this, 'addNotificationsInToSubMenuPage'));*/
-
-
-        // Add Actions & Filters
-        // http://plugin.michael-simpson.com/?page_id=37
-		add_action('save_post', array(&$this, 'addNotification'));
-
-
-        // Register short codes
-        // http://plugin.michael-simpson.com/?page_id=39
-
-
-        // Register AJAX hooks
-        // http://plugin.michael-simpson.com/?page_id=41
-		add_action('wp_ajax_update_destinations', array(&$this, 'ajaxUpdateDestinations'));
-		// http://cinra-wpnc-03.vtest01.info/wordpress/wp-admin/admin-ajax.php?action=update_destinations&whatever=100
-
-
-		// for redirection to work properly, ob_start needs to be added.
-		add_action('init', array(&$this, 'appOutputBuffer'));
-
-		wp_enqueue_script('jquery-ui-core');
-
-		// 'wp_dashboard_setup' アクションにフックし、登録する
-		add_action('wp_dashboard_setup', array(&$this, 'wpnc_add_dashboard_widgets') );
+    // Add options administration page
+    // http://plugin.michael-simpson.com/?page_id=47
+    add_action('admin_menu', array(&$this, 'addSettingsSubMenuPage'));
+    /*		add_action('admin_menu', array(&$this, 'addNotificationsOutToSubMenuPage'));
+    add_action('admin_menu', array(&$this, 'addNotificationsInToSubMenuPage'));*/
+    
+    
+    // Add Actions & Filters
+    // http://plugin.michael-simpson.com/?page_id=37
+    add_action('save_post', array(&$this, 'addNotification'));
+    
+    
+    // Register short codes
+    // http://plugin.michael-simpson.com/?page_id=39
+    
+    
+    // Register AJAX hooks
+    // http://plugin.michael-simpson.com/?page_id=41
+    add_action('wp_ajax_update_destinations', array(&$this, 'ajaxUpdateDestinations'));
+    // http://cinra-wpnc-03.vtest01.info/wordpress/wp-admin/admin-ajax.php?action=update_destinations&whatever=100
+    
+    
+    // for redirection to work properly, ob_start needs to be added.
+    add_action('init', array(&$this, 'appOutputBuffer'));
+    
+    wp_enqueue_script('jquery-ui-core');
+    
+    // 'wp_dashboard_setup' アクションにフックし、登録する
+    add_action('wp_dashboard_setup', array(&$this, 'wpnc_add_dashboard_widgets') );
 
 	}
 
-	public function appNotificationOutCustomBox($column_name, $screen) {
+	public function appNotificationOutCustomBox($column_name, $screen)
+	{
+		
 		$my_fields = array(
 			array(
 				'column_name' => 'destinations',
@@ -142,9 +158,11 @@ class WPNC_Plugin extends WPNC_LifeCycle {
 			),
 		);
 
-		foreach ($my_fields as $field) :
+		foreach ($my_fields as $field)
+		{
 
-			if ( $column_name === $field['column_name'] && $screen === 'edit-tags' ) :
+			if ( $column_name === $field['column_name'] && $screen === 'edit-tags' )
+			{
 
 				print( '<fieldset><div class="inline-edit-col">' );
 				print( '<label>' );
@@ -153,32 +171,30 @@ class WPNC_Plugin extends WPNC_LifeCycle {
 				print( '</label>' );
 				print( '</div></fieldset>' );
 
-			endif;
+			}
 
-		endforeach;
+		}
 
 	}
 
-	public function appOutputBuffer() {
+	public function appOutputBuffer()
+	{
 		ob_start();
 	}
 
-	public function addNotification($post_ID) {
+	public function addNotification($post_ID)
+	{
+		
 		global $wpdb;
 		$table_prefix = WPNC_PREFIX;
 
 		// only "post"s are to be notified
 		$post_type = get_post_type($post_ID);
-		if ($post_type != 'post') {
-			return;
-		}
+		if ($post_type != 'post') return;
 
 		// my site id has to be set.
 		$my_site_id = get_option('WPNC_Plugin_MySiteID', 'none');
-		if ($my_site_id == 'none') {
-			return;
-		}
-
+		if ($my_site_id == 'none') return;
 
 		// do nothing for posts in category for inbound notification.
 		$assigned_category = get_option('WPNC_Plugin_Category', "none");
@@ -230,7 +246,8 @@ class WPNC_Plugin extends WPNC_LifeCycle {
 		$where = "";
 		$results = $wpdb->get_results($sql);
 		$is_exist = $results[0]->cnt;
-		if ($is_exist > 0) {
+		if ($is_exist > 0)
+		{
 			$notification_status = "UPDATE";
 			$modify_date = date('Y-m-d H:i:s');
 			
@@ -238,7 +255,9 @@ class WPNC_Plugin extends WPNC_LifeCycle {
 				"update {$table_prefix}notifications_out set wp_post_title = %s, wp_post_content = %s, wp_tags = %s, wp_eyechatch_path_org = %s, post_date = %s, post_status = %s, notification_status = %s, modify_date = %s where wp_postid = %s",
 				$wp_post_title, $wp_post_content, $wp_tags, $wp_eyecatch_path_org, $post_date, $post_status, $notification_status, $modify_date, $wp_postid);
 			$wpdb->query($query_u);
-		} else {
+		}
+		else
+		{
 			$query_i = $wpdb->prepare(
 				"insert into {$table_prefix}notifications_out set wp_postid = %s, website_id = %s, wp_post_title = %s, wp_post_content = %s, wp_tags = %s, wp_eyechatch_path_org = %s, post_date = %s, post_status = %s, notification_status = %s, create_date = %s, modify_date = %s",
 				$post_ID, $website_id, $wp_post_title, $wp_post_content, $wp_tags, $wp_eyecatch_path_org, $post_date, $post_status, $notification_status, $create_date, $modify_date);
@@ -247,7 +266,9 @@ class WPNC_Plugin extends WPNC_LifeCycle {
 
 	}
 
-	public function ajaxUpdateDestinations() {
+	public function ajaxUpdateDestinations()
+	{
+		
 		global $wpdb;
 		$table_prefix = WPNC_PREFIX;
 
@@ -304,7 +325,8 @@ class WPNC_Plugin extends WPNC_LifeCycle {
 	}
 
 	// ダッシュボードウィジェットにコンテンツを出力する関数を作成する
-	function wpnc_dashboard_widget_function() {
+	function wpnc_dashboard_widget_function()
+	{
 
 		$plugin_url = plugins_url( $path, $plugin );
 		$url_notifications_out = "plugins.php?page=WPNC_PluginNotifcationsOut";
@@ -319,14 +341,17 @@ class WPNC_Plugin extends WPNC_LifeCycle {
 
 		echo "通知(OUT)は<a href='$url_notifications_out'>こちら</a>";
 		echo "<script type='text/javascript'>function dashboardRefresh() { location.href='".$url_refresh."';} setInterval('dashboardRefresh()',3600000);</script>";
+		
 	}
 
 	// アクションフックで使用する関数を作成する
-	function wpnc_add_dashboard_widgets() {
+	function wpnc_add_dashboard_widgets()
+	{
 		wp_add_dashboard_widget('wpnc_dashboard_widget', 'Wordpress Notification Center', array(&$this, 'wpnc_dashboard_widget_function'));
 	}
 
-	function wpnc_dashboard_list_notifications_out() {
+	function wpnc_dashboard_list_notifications_out()
+	{
 		global $wpdb;
 		$table_prefix = WPNC_PREFIX;
 
@@ -360,6 +385,5 @@ EOF;
 		return $output;
 
 	}
-
 
 }

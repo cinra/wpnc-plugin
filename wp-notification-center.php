@@ -38,7 +38,8 @@ $WPNC_minimalRequiredPhpVersion = '5.0';
  * @return boolean true if version check passed. If false, triggers an error which WP will handle, by displaying
  * an error message on the Admin page
  */
-function WPNC_noticePhpVersionWrong() {
+function WPNC_noticePhpVersionWrong()
+{
     global $WPNC_minimalRequiredPhpVersion;
     echo '<div class="updated fade">' .
       __('Error: plugin "wp-notification-center" requires a newer version of PHP to be running.',  'wp-notification-center').

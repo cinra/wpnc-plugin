@@ -715,10 +715,3 @@ class Notifications_In_List extends WP_List_Table {
 
 
 }
-
-
-
-
-
-
-
