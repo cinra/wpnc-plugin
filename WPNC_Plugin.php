@@ -330,11 +330,11 @@ class WPNC_Plugin extends WPNC_LifeCycle
 
 		$plugin_url = plugins_url( $path, $plugin );
 		$url_notifications_out = "plugins.php?page=WPNC_PluginNotifcationsOut";
-		$url_refresh           = admin_url('plugins.php?page=WPNC_PluginNotifcationsIn&action=refresh_dashboard');
+		$url_refresh           = admin_url('edit.php?page=WPNC_PluginNotifcationsIn&action=refresh_dashboard');
 
 		echo "<a href='$url_refresh'><button class='button button-primary'>リフレッシュ</button></a>&nbsp;&nbsp;&nbsp;&nbsp;";
 		// Display whatever it is you want to show
-		echo "<a href='plugins.php?page=WPNC_PluginNotifcationsIn'>全ての通知(IN)を見る</a><br/>";
+		echo "<a href='edit.php?page=WPNC_PluginNotifcationsIn'>全ての通知(IN)を見る</a><br/>";
 
 		echo $this->wpnc_dashboard_list_notifications_out();
 		echo "<br/><br/>";
@@ -369,7 +369,7 @@ class WPNC_Plugin extends WPNC_LifeCycle
 			$create_date     = $row->create_date;
 			$id              = $row->id;
 			$title           = mb_substr($row->wp_post_title,0,10)."...";
-			$post_create_url = "plugins.php?page=WPNC_PluginNotifcationsIn&action=send&notificationin[]=$id";
+			$post_create_url = "edit.php?page=WPNC_PluginNotifcationsIn&action=send&notificationin[]=$id";
 			$rows_html[] =<<<EOF
 		<li>
 			<span>$create_date</span>

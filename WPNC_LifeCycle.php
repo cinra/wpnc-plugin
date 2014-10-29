@@ -118,6 +118,7 @@ class WPNC_LifeCycle extends WPNC_InstallIndicator
   	
   	global $wpdb;
   	$table_prefix = WPNC_PREFIX;
+  	$db_engine = defined(WPNC_DB_ENGINE) ? WPNC_DB_ENGINE : 'InnoDB';
   
   	$sql1 = <<<EOF
 CREATE TABLE IF NOT EXISTS `{$table_prefix}notifications_in` (
@@ -136,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `{$table_prefix}notifications_in` (
 `create_date` datetime DEFAULT NULL,
 `modify_date` datetime DEFAULT NULL,
 PRIMARY KEY (`id`)
-) DEFAULT CHARSET=utf8
+) ENGINE={$db_engine} DEFAULT CHARSET=utf8
 EOF;
 
   	$sql2 = <<<EOF
@@ -158,7 +159,7 @@ CREATE TABLE IF NOT EXISTS `{$table_prefix}notifications_out` (
 `destinations` text,
 `destinations_values` text,
 PRIMARY KEY (`id`)
-) DEFAULT CHARSET=utf8
+) ENGINE={$db_engine} DEFAULT CHARSET=utf8
 EOF;
 
   	$wpdb->query($sql1);

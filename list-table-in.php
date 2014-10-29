@@ -305,7 +305,7 @@ class Notifications_In_List extends WP_List_Table {
             // wp_die('投稿を作成しました!');
         } else if ( 'refresh' ===$this->current_action() ) {
 			$this->process_refresh();
-			$redirect_to = admin_url('plugins.php?page=WPNC_PluginNotifcationsIn#refresh_done');
+			$redirect_to = admin_url('edit.php?page=WPNC_PluginNotifcationsIn#refresh_done');
 			wp_redirect($redirect_to, 302);
 
 		} else if ( 'refresh_dashboard' ===$this->current_action() ) {
@@ -334,7 +334,7 @@ class Notifications_In_List extends WP_List_Table {
 		}
 
 		// redirect after deletion
-		$redirect_to = admin_url('plugins.php?page=WPNC_PluginNotifcationsIn#deletion_done');
+		$redirect_to = admin_url('edit.php?page=WPNC_PluginNotifcationsIn#deletion_done');
 		wp_redirect($redirect_to, 302);
 		exit;
 

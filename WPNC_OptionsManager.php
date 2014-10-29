@@ -612,7 +612,7 @@ class WPNC_OptionsManager {
 		//Fetch, prepare, sort, and filter our data...
 		$testListTable->prepare_items();
 
-		$refresh_url = admin_url('plugins.php?page=WPNC_PluginNotifcationsIn&action=refresh');
+		$refresh_url = admin_url('edit.php?page=WPNC_PluginNotifcationsIn&action=refresh');
 
 		?>
 		<div class="wrap">
