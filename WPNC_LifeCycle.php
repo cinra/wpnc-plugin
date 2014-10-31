@@ -291,7 +291,7 @@ EOF;
     add_submenu_page('edit.php',
                      $displayName,
                      $displayName,
-                     'manage_options',
+                     'publish_posts',
                      $this->getNotificationsOutSlug(),
                      array(&$this, 'notificationsOutPage'));
   }
@@ -303,7 +303,7 @@ EOF;
     add_submenu_page('edit.php',
     				$displayName,
     				$displayName,
-    				'manage_options',
+    				'publish_posts',
     				$this->getNotificationsInSlug(),
     				array(&$this, 'notificationsInPage'));
   }

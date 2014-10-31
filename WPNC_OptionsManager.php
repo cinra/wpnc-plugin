@@ -157,7 +157,8 @@ class WPNC_OptionsManager {
      * @param  $value mixed the new value
      * @return null from delegated call to delete_option()
      */
-    public function updateOption($optionName, $value) {
+    public function updateOption($optionName, $value)
+    {
         $prefixedOptionName = $this->prefix($optionName); // how it is stored in DB
         return update_option($prefixedOptionName, $value);
     }
@@ -261,25 +262,24 @@ class WPNC_OptionsManager {
      * Override this method to create a customized page.
      * @return void
      */
-    public function settingsPage() {
+    public function settingsPage()
+    {
 
-        if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions to access this page.', 'wp-notification-center'));
-        }
+      if (!current_user_can('publish_posts')) wp_die(__('You do not have sufficient permissions to access this page.', 'wp-notification-center'));
+  
+      $optionMetaData = $this->getOptionMetaData();
 
-        $optionMetaData = $this->getOptionMetaData();
-
-		// Destinatios (websites) are automatically updated.
-		
-		$websites = $this->acquire_websites();
-		
-		$my_site_id = $this->getMySiteID($websites);
+  		// Destinatios (websites) are automatically updated.
+  		
+  		$websites = $this->acquire_websites();
+  		
+  		$my_site_id = $this->getMySiteID($websites);
     
-		// var_dump($websites);
-		$this->updateOption('Websites', $websites);
-		$my_websites = get_option('WPNC_Plugin_Websites', 'none');
-
-		$this->updateOption('MySiteID', $my_site_id);
+  		#var_dump($websites);
+  		$this->updateOption('Websites', $websites);
+  		$my_websites = get_option('WPNC_Plugin_Websites', 'none');
+  
+  		$this->updateOption('MySiteID', $my_site_id);
 
 
         // Save Posted Options
@@ -468,7 +468,7 @@ class WPNC_OptionsManager {
      */
     public function notificationsOutPage() {
 		// $screen = get_current_screen(); var_dump($screen);
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can('publish_posts')) {
             wp_die(__('You do not have sufficient permissions to access this page.', 'wp-notification-center'));
         }
 		    //Create an instance of our package class...
@@ -604,7 +604,7 @@ class WPNC_OptionsManager {
 	 * @return void
 	 */
 	public function notificationsInPage() {
-		if (!current_user_can('manage_options')) {
+		if (!current_user_can('publish_posts')) {
 			wp_die(__('You do not have sufficient permissions to access this page.', 'wp-notification-center'));
 		}
 		//Create an instance of our package class...
@@ -641,7 +641,9 @@ class WPNC_OptionsManager {
 	<?php
 	}
 
-	function acquire_websites() {
+	function acquire_websites()
+	{
+		
 		$endpoint_uri = get_option('WPNC_Plugin_EndPointURI', '');
 		$apikey = get_option('WPNC_Plugin_APIKey', '');
     
@@ -653,7 +655,7 @@ class WPNC_OptionsManager {
 		}
     
 		$websites_json = json_encode($this->fetch_websites($endpoint_uri, $apikey));
-		
+		#echo '<pre>';print_r($websites_json);echo '</pre>';exit;
 		return $websites_json;
 	}
 
@@ -666,7 +668,8 @@ class WPNC_OptionsManager {
 	}
 
 
-	function fetch_websites($in_endpoint_uri, $apikey) {
+	function fetch_websites($in_endpoint_uri, $apikey)
+	{
 		
 		$api_function = 'ApiWebsites/';
 		#exit("$in_endpoint_uri/$api_function?apikey=$apikey");
@@ -692,24 +695,35 @@ class WPNC_OptionsManager {
 		
 		$output 	 = curl_exec($curl);*/
 		
-		$output = file_get_contents("$in_endpoint_uri/$api_function?apikey=$apikey");
+		$context = stream_context_create(array(
+      'http' => array('ignore_errors' => true)
+    ));
+		
+		$output = file_get_contents("$in_endpoint_uri/$api_function?apikey=$apikey", false, $context);
     $output_json = json_decode($output, true);
+    
+    #$pos = strpos($http_response_header[0], '200');
+    
+    #echo '<pre>';print_r($http_response_header);echo '</pre>';exit;
+    
+    #echo '<pre>';print_r($output);echo '</pre>';exit;
+    #echo "$in_endpoint_uri/$api_function?apikey=$apikey";exit();
 
-		if (is_null($output_json)) {
+		if (is_null($output_json))
+		{
 			return null;
-		} else {
-			if (isset($output_json['error'])) {
-				return null;
-			}
+		}
+		else
+		{
+			if (isset($output_json['error'])) return null;
 		}
 		
 		
 
 		$websites = array();
-		if (isset($output_json['result'])) {
-			foreach ($output_json['result'] as $website) {
-				$websites[] = $website['websites'];
-			}
+		if (isset($output_json['result']))
+		{
+			foreach ($output_json['result'] as $website) $websites[] = $website['websites'];
 			return $websites;
 		}
 

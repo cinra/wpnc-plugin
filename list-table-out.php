@@ -15,7 +15,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-	Portions 2014 Cinra, Co., Ltd.
+  Portions 2014 Cinra, Co., Ltd.
 */
 
 
@@ -133,9 +133,9 @@ class Notifications_Out_List extends WP_List_Table {
     function column_ID($item){
         
         //Build row actions
-		$actions = array(
-			'delete'    => sprintf('<a href="?page=%s&action=%s&notificationout[]=%s">削除</a>',$_REQUEST['page'],'delete',$item['id']),
-		);
+    $actions = array(
+      'delete'    => sprintf('<a href="?page=%s&action=%s&notificationout[]=%s">削除</a>',$_REQUEST['page'],'delete',$item['id']),
+    );
 
         
         //Return the title contents
@@ -146,83 +146,83 @@ class Notifications_Out_List extends WP_List_Table {
         );
     }
 
-	function column_wp_eyechatch_path_org ($item) {
-		$ret_value = '';
+  function column_wp_eyechatch_path_org ($item) {
+    $ret_value = '';
 
-		if (strlen($item['wp_eyechatch_path_org']) > 0) {
-			$ret_value = "<img src=\"".$item['wp_eyechatch_path_org']."\" width=\"100\">";
-		}
+    if (strlen($item['wp_eyechatch_path_org']) > 0) {
+      $ret_value = "<img src=\"".$item['wp_eyechatch_path_org']."\" width=\"100\">";
+    }
 
-		return $ret_value;
-	}
+    return $ret_value;
+  }
 
 
-	function column_destinations($item){
+  function column_destinations($item){
 
-		//Build row actions
-		$actions = array(
-// 			'edit'      => sprintf('<a href="?page=%s&action=%s&id=%s">Edit</a>',$_REQUEST['page'],'edit',$item['ID']),
-			'edit2'      => sprintf('<a href="javascript:void(0)" class="quick_edit_show" id="destinations_%s">通知先編集</a>',$item['ID']),
-		);
+    //Build row actions
+    $actions = array(
+//      'edit'      => sprintf('<a href="?page=%s&action=%s&id=%s">Edit</a>',$_REQUEST['page'],'edit',$item['ID']),
+      'edit2'      => sprintf('<a href="javascript:void(0)" class="quick_edit_show" id="destinations_%s">通知先編集</a>',$item['ID']),
+    );
 
-		$select_string = $this->build_select_string($item['destinations_values'],$item['ID']);
-		$destinations = '<div id="text_select_destinations_'.$item['ID'].'">'
-			. str_replace(',', '<br>', $item['destinations'])
-			. '</div>';
+    $select_string = $this->build_select_string($item['destinations_values'],$item['ID']);
+    $destinations = '<div id="text_select_destinations_'.$item['ID'].'">'
+      . str_replace(',', '<br>', $item['destinations'])
+      . '</div>';
 
-		//Return the title contents
-		return sprintf('%s<span style="color:silver; display: none;" id="edit_destinations_%s">%s<button type="button" class="quick_edit_update" id="button_destinations_%s">更新</button></span>%s',
-			/*$1%s*/ $destinations /* $item['destinations'] */,
-			/*$2%s*/ $item['ID'],
-			/*$3%s*/ $select_string,
-			/*$2%s*/ $item['ID'],
-			/*$4%s*/ $this->row_actions($actions)
-		);
-	}
+    //Return the title contents
+    return sprintf('%s<span style="color:silver; display: none;" id="edit_destinations_%s">%s<button type="button" class="quick_edit_update" id="button_destinations_%s">更新</button></span>%s',
+      /*$1%s*/ $destinations /* $item['destinations'] */,
+      /*$2%s*/ $item['ID'],
+      /*$3%s*/ $select_string,
+      /*$2%s*/ $item['ID'],
+      /*$4%s*/ $this->row_actions($actions)
+    );
+  }
 
-	function build_select_string($in_d_values, $in_id) {
-		$my_websites = json_decode(get_option('WPNC_Plugin_Websites', 'none'), true);
-		$selected_values = explode(',', $in_d_values);
-		$output = '<div class="multiselect">';
-		foreach ($my_websites as $website) {
-			if (is_null($website['id'])) {
-				continue;
-			}
-			if (array_search($website['id'], $selected_values)) {
-				$selected = "checked";
-			} else {
-				$selected = " ";
-			}
-			$output .= '<label><input type="checkbox" name="select_destinations_'.$in_id.'" value="'.$website['id'].'" />'.$website['name'].'</label>'."\n";
-		}
-		$output .= "</div>";
+  function build_select_string($in_d_values, $in_id) {
+    $my_websites = json_decode(get_option('WPNC_Plugin_Websites', 'none'), true);
+    $selected_values = explode(',', $in_d_values);
+    $output = '<div class="multiselect">';
+    foreach ($my_websites as $website) {
+      if (is_null($website['id'])) {
+        continue;
+      }
+      if (array_search($website['id'], $selected_values)) {
+        $selected = "checked";
+      } else {
+        $selected = " ";
+      }
+      $output .= '<label><input type="checkbox" name="select_destinations_'.$in_id.'" value="'.$website['id'].'" />'.$website['name'].'</label>'."\n";
+    }
+    $output .= "</div>";
 
 /*
-		// echo "<pre>";var_dump($selected_values); var_dump($my_websites);
-		$output = '<select multiple id="select_destinations_'.$in_id.'" name="select_destinations_'.$in_id.'" class="multiselect" >';
-		foreach ($my_websites as $website) {
-			if (array_search($website['id'], $selected_values)) {
-				$selected = "selected";
-			} else {
-				$selected = " ";
-			}
-			$output .= "<option value='".$website['id']."' $selected >".$website['name']."</option>";
-		}
-		$output .= "</select>";
+    // echo "<pre>";var_dump($selected_values); var_dump($my_websites);
+    $output = '<select multiple id="select_destinations_'.$in_id.'" name="select_destinations_'.$in_id.'" class="multiselect" >';
+    foreach ($my_websites as $website) {
+      if (array_search($website['id'], $selected_values)) {
+        $selected = "selected";
+      } else {
+        $selected = " ";
+      }
+      $output .= "<option value='".$website['id']."' $selected >".$website['name']."</option>";
+    }
+    $output .= "</select>";
 */
-		return $output;
+    return $output;
 
-	}
+  }
 
-/*	function column_destinations_values($item) {
-		return sprintf('<div id="value_destinations_%s">%s</div>',
-			$item['ID'],
-			$item['destinations_value']
-		);
-	}*/
+/*  function column_destinations_values($item) {
+    return sprintf('<div id="value_destinations_%s">%s</div>',
+      $item['ID'],
+      $item['destinations_value']
+    );
+  }*/
 
 
-	/** ************************************************************************
+  /** ************************************************************************
      * REQUIRED if displaying checkboxes or using bulk actions! The 'cb' column
      * is given special treatment when columns are processed. It ALWAYS needs to
      * have it's own method.
@@ -239,13 +239,13 @@ class Notifications_Out_List extends WP_List_Table {
         );
     }
 
-	function column_wp_post_title($item) {
-		return sprintf(
-			'<a href="post.php?post=%1$s&action=edit">%2$s</a>',
-			$item['wp_postid'],
-			$item['wp_post_title']
-		);
-	}
+  function column_wp_post_title($item) {
+    return sprintf(
+      '<a href="post.php?post=%1$s&action=edit">%2$s</a>',
+      $item['wp_postid'],
+      $item['wp_post_title']
+    );
+  }
 
 
     /** ************************************************************************
@@ -263,20 +263,20 @@ class Notifications_Out_List extends WP_List_Table {
      **************************************************************************/
     function get_columns(){
         $columns = array(
-            'cb'        			      => '<input type="checkbox" />', //Render a checkbox instead of text
-            #'ID'     				        => 'ID',
-            #'wp_postid'     		    => 'PostID',
+            'cb'                    => '<input type="checkbox" />', //Render a checkbox instead of text
+            #'ID'                     => 'ID',
+            #'wp_postid'            => 'PostID',
             'wp_eyechatch_path_org' => '画像',
-            'wp_post_title'     	  => 'タイトル',
+            'wp_post_title'         => 'タイトル',
             #'wp_post_content'       => '投稿内容',
-            'post_date'     		    => '投稿日',
-            'wp_tags'     			    => 'タグ',
-            'post_status'     		  => '投稿ステータス',
+            'post_date'             => '投稿日',
+            'wp_tags'               => 'タグ',
+            'post_status'           => '投稿ステータス',
             'notification_status'   => '通知ステータス',
-            'destinations'     		  => '通知先サイト',
-//            'create_date'     		=> 'Create Date',
-//            'modify_date'     		=> 'Modify Date',
-      			'destinations_values'   => 'Destinations Values',
+            'destinations'          => '通知先サイト',
+//            'create_date'         => 'Create Date',
+//            'modify_date'         => 'Modify Date',
+            'destinations_values'   => 'Destinations Values',
         );
         return $columns;
     }
@@ -298,11 +298,11 @@ class Notifications_Out_List extends WP_List_Table {
      **************************************************************************/
     function get_sortable_columns() {
         $sortable_columns = array(
-			/*
+      /*
             'title'     => array('title',false),     //true means it's already sorted
             'rating'    => array('rating',false),
             'director'  => array('director',false)
-			 */
+       */
         );
         return $sortable_columns;
     }
@@ -339,145 +339,145 @@ class Notifications_Out_List extends WP_List_Table {
      * @see $this->prepare_items()
      **************************************************************************/
     function process_bulk_action() {
-		// var_dump($_REQUEST['notificationout']);
+    // var_dump($_REQUEST['notificationout']);
         
         //Detect when a bulk action is being triggered...
         if( 'delete'===$this->current_action() ) {
-			$this->process_bulk_delete($_REQUEST['notificationout']);
+      $this->process_bulk_delete($_REQUEST['notificationout']);
             wp_die('Items deleted (or they would be if we had items to delete)!');
         } else if( 'send'===$this->current_action() ) {
-			// var_dump($_REQUEST['notificationout']);
-			$this->process_bulk_send($_REQUEST['notificationout']);
+      // var_dump($_REQUEST['notificationout']);
+      $this->process_bulk_send($_REQUEST['notificationout']);
             // wp_die('Items are sent!');
         }
         
     }
 
-	function process_bulk_delete($in_target_ids) {
-		global $wpdb;
+  function process_bulk_delete($in_target_ids) {
+    global $wpdb;
 
-		if (!is_array($in_target_ids)) {
-			$in_target_ids = array($in_target_ids);
-		}
+    if (!is_array($in_target_ids)) {
+      $in_target_ids = array($in_target_ids);
+    }
 
 
-		global $wpdb;
-		$table_prefix = WPNC_PREFIX;
+    global $wpdb;
+    $table_prefix = WPNC_PREFIX;
 
-		foreach ($in_target_ids as $rec_id) {
-			$query = $wpdb->prepare(
-				"delete from {$table_prefix}notifications_out where id = %s",
-				$rec_id);
-			$rows = $wpdb->get_results($query);
-		}
+    foreach ($in_target_ids as $rec_id) {
+      $query = $wpdb->prepare(
+        "delete from {$table_prefix}notifications_out where id = %s",
+        $rec_id);
+      $rows = $wpdb->get_results($query);
+    }
 
-		// redirect after deletion
-		$redirect_to = admin_url('plugins.php?page=WPNC_PluginNotifcationsOut#deletion_done');
-		wp_redirect($redirect_to, 302);
-		exit;
+    // redirect after deletion
+    $redirect_to = admin_url('plugins.php?page=WPNC_PluginNotifcationsOut#deletion_done');
+    wp_redirect($redirect_to, 302);
+    exit;
 
-	}
+  }
 
-	function process_bulk_send($in_target_ids) {
-		global $wpdb;
-		$table_prefix = WPNC_PREFIX;
+  function process_bulk_send($in_target_ids) {
+    global $wpdb;
+    $table_prefix = WPNC_PREFIX;
 
-		$endpoint_uri = get_option('WPNC_Plugin_EndPointURI', 'none');
-		$apikey = get_option('WPNC_Plugin_APIKey', 'none');
-		if ($endpoint_uri == 'none' || $apikey == 'none') {
-			echo "EndPoint URIと API Keyを正しく設定して下さい.";
-			return null;
-		}
+    $endpoint_uri = get_option('WPNC_Plugin_EndPointURI', 'none');
+    $apikey = get_option('WPNC_Plugin_APIKey', 'none');
+    if ($endpoint_uri == 'none' || $apikey == 'none') {
+      echo "EndPoint URIと API Keyを正しく設定して下さい.";
+      return null;
+    }
 
-		if (!is_array($in_target_ids)) {
-			$target_ids = array ($in_target_ids);
-		} else {
-			$target_ids = $in_target_ids;
-		}
-		error_log("TARGETS:".print_r($target_ids,true));
+    if (!is_array($in_target_ids)) {
+      $target_ids = array ($in_target_ids);
+    } else {
+      $target_ids = $in_target_ids;
+    }
+    error_log("TARGETS:".print_r($target_ids,true));
 
-		$show_alert = false;
-		foreach ($target_ids as $rec_id) {
-			$query = $wpdb->prepare(
-				"select * from {$table_prefix}notifications_out where id = %s",
-				$rec_id);
-			$row = $wpdb->get_results($query);
-			if (is_null($row)) {
-				continue;
-			}
-			error_log(json_encode($row));
-			$row_data = $row[0];
-			/*
-			$id                    = $row->id;
-			$website_id            = $row->website_id;
-			$wp_postid             = $row->wp_postid;
-			$wp_post_title         = $row->wp_post_title;
-			$wp_post_content       = $row->wp_post_content;
-			$wp_tags               = $row->wp_tags;
-			$wp_eyechatch_path_org = $row->wp_eyechatch_path_org;
-			$post_date             = $row->post_date;
-			$post_status           = $row->post_status;
-			$notification_status   = $row->notification_status;
-			$create_date           = $row->create_date;
-			$modify_date           = $row->modify_date;
-			 */
-			unset($row_data->id);
+    $show_alert = false;
+    foreach ($target_ids as $rec_id) {
+      $query = $wpdb->prepare(
+        "select * from {$table_prefix}notifications_out where id = %s",
+        $rec_id);
+      $row = $wpdb->get_results($query);
+      if (is_null($row)) {
+        continue;
+      }
+      error_log(json_encode($row));
+      $row_data = $row[0];
+      /*
+      $id                    = $row->id;
+      $website_id            = $row->website_id;
+      $wp_postid             = $row->wp_postid;
+      $wp_post_title         = $row->wp_post_title;
+      $wp_post_content       = $row->wp_post_content;
+      $wp_tags               = $row->wp_tags;
+      $wp_eyechatch_path_org = $row->wp_eyechatch_path_org;
+      $post_date             = $row->post_date;
+      $post_status           = $row->post_status;
+      $notification_status   = $row->notification_status;
+      $create_date           = $row->create_date;
+      $modify_date           = $row->modify_date;
+       */
+      unset($row_data->id);
 
-			// only send records with destinations(s)
-			if (!isset($row_data->destinations_values) || empty($row_data->destinations_values)) {
-				$show_alert = true;
-				continue;
-			}
+      // only send records with destinations(s)
+      if (!isset($row_data->destinations_values) || empty($row_data->destinations_values)) {
+        $show_alert = true;
+        continue;
+      }
 
-			// data is sent one notification per one destination.
-			$destinations = explode(',', $row_data->destinations_values);
+      // data is sent one notification per one destination.
+      $destinations = explode(',', $row_data->destinations_values);
 
-			foreach ($destinations as $website_id) {
-				error_log(json_encode($row_data));
-				$row_data->website_id = $website_id;
-				$notification_data = json_encode($row_data);
-				$send_result = $this->send_notification($endpoint_uri, $apikey, $notification_data);
-				error_log(json_encode($send_result));
-			// var_dump($send_result);
-			}
+      foreach ($destinations as $website_id) {
+        error_log(json_encode($row_data));
+        $row_data->website_id = $website_id;
+        $notification_data = json_encode($row_data);
+        $send_result = $this->send_notification($endpoint_uri, $apikey, $notification_data);
+        error_log(json_encode($send_result));
+      // var_dump($send_result);
+      }
 
-			$query = $wpdb->prepare(
-				"delete from {$table_prefix}notifications_out where id = %s",
-				$rec_id);
-			$rows = $wpdb->get_results($query);
+      $query = $wpdb->prepare(
+        "delete from {$table_prefix}notifications_out where id = %s",
+        $rec_id);
+      $rows = $wpdb->get_results($query);
 
-		}
+    }
 
-		// redirect after deletion
-		// $redirect_to = admin_url('plugins.php?page=WPNC_PluginNotifcationsOut#bulk_send_done');
-		// wp_redirect($redirect_to, 302);
-		// exit;
+    // redirect after deletion
+    // $redirect_to = admin_url('plugins.php?page=WPNC_PluginNotifcationsOut#bulk_send_done');
+    // wp_redirect($redirect_to, 302);
+    // exit;
 
-		if ($show_alert == true) {
-			echo "<div class='error'><p>通知先が設定されていないレコードは送信されませんでした</p></div>";
-		}
-		return null;
-	}
+    if ($show_alert == true) {
+      echo "<div class='error'><p>通知先が設定されていないレコードは送信されませんでした</p></div>";
+    }
+    return null;
+  }
 
-	function send_notification($in_endpoint_uri, $apikey, $in_notification_data) {
-		$api_function = 'ApiNotifications/add.json';
-		
-		$curl = curl_init("$in_endpoint_uri/$api_function?apikey=$apikey");
-		curl_setopt($curl,CURLOPT_POST, TRUE);
-		curl_setopt($curl,CURLOPT_POSTFIELDS, $in_notification_data);
-		curl_setopt($curl,CURLOPT_SSL_VERIFYPEER, FALSE);  // オレオレ証明書対策
-		curl_setopt($curl,CURLOPT_SSL_VERIFYHOST, FALSE);  // 
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($curl,CURLOPT_COOKIEJAR,      'cookie');
-		curl_setopt($curl,CURLOPT_COOKIEFILE,     'tmp');
-		curl_setopt($curl,CURLOPT_FOLLOWLOCATION, TRUE); // Locationヘッダを追跡
-		//curl_setopt($curl,CURLOPT_REFERER,        "REFERER");
-		//curl_setopt($curl,CURLOPT_USERAGENT,      "USER_AGENT"); 
+  function send_notification($in_endpoint_uri, $apikey, $in_notification_data) {
+    $api_function = 'ApiNotifications/add.json';
+    
+    $curl = curl_init("$in_endpoint_uri/$api_function?apikey=$apikey");
+    curl_setopt($curl,CURLOPT_POST, TRUE);
+    curl_setopt($curl,CURLOPT_POSTFIELDS, $in_notification_data);
+    curl_setopt($curl,CURLOPT_SSL_VERIFYPEER, FALSE);  // オレオレ証明書対策
+    curl_setopt($curl,CURLOPT_SSL_VERIFYHOST, FALSE);  // 
+    curl_setopt($curl,CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($curl,CURLOPT_COOKIEJAR,      'cookie');
+    curl_setopt($curl,CURLOPT_COOKIEFILE,     'tmp');
+    curl_setopt($curl,CURLOPT_FOLLOWLOCATION, TRUE); // Locationヘッダを追跡
+    //curl_setopt($curl,CURLOPT_REFERER,        "REFERER");
+    //curl_setopt($curl,CURLOPT_USERAGENT,      "USER_AGENT"); 
 
-		$output = curl_exec($curl);
+    $output = curl_exec($curl);
 
-		return $output;
-	}
+    return $output;
+  }
 
 
     /** ************************************************************************
@@ -497,7 +497,7 @@ class Notifications_Out_List extends WP_List_Table {
      **************************************************************************/
     function prepare_items() {
         global $wpdb; //This is used only if making any database queries
-		$table_prefix = WPNC_PREFIX;
+    $table_prefix = WPNC_PREFIX;
 
         /**
          * First, lets decide how many records per page to show
@@ -542,30 +542,30 @@ class Notifications_Out_List extends WP_List_Table {
          * use sort and pagination data to build a custom query instead, as you'll
          * be able to use your precisely-queried data immediately.
          */
-		$query = "SELECT * FROM {$table_prefix}notifications_out order by post_date desc";
-		$totalitems = $wpdb->query($query);
-		$items = $wpdb->get_results($query);
-		$data = array();
-		foreach ($items as $item) {
-			$rec = array();
-			$rec['ID'] = $item->id;
-			$rec['website_id'] = $item->website_id;
-			$rec['wp_postid'] = $item->wp_postid;
-			$rec['wp_post_title'] = $item->wp_post_title;
-			$rec['wp_post_content'] = mb_substr(strip_tags($item->wp_post_content),0,10)."...";
-			$rec['wp_tags'] = $item->wp_tags;
-			$rec['wp_eyechatch_path_org'] = $item->wp_eyechatch_path_org;
-			$rec['post_date'] = $item->post_date;
-			$rec['post_status'] = $item->post_status;
-			$rec['notification_status'] = $item->notification_status;
-			$rec['destinations'] = $item->destinations;
-			
-			$rec['create_date'] = $item->create_date;
-			$rec['modify_date'] = $item->modify_date;
-			$rec['destinations_values'] = $item->destinations_values;
+    $query = "SELECT * FROM {$table_prefix}notifications_out order by post_date desc";
+    $totalitems = $wpdb->query($query);
+    $items = $wpdb->get_results($query);
+    $data = array();
+    foreach ($items as $item) {
+      $rec = array();
+      $rec['ID'] = $item->id;
+      $rec['website_id'] = $item->website_id;
+      $rec['wp_postid'] = $item->wp_postid;
+      $rec['wp_post_title'] = $item->wp_post_title;
+      $rec['wp_post_content'] = mb_substr(strip_tags($item->wp_post_content),0,10)."...";
+      $rec['wp_tags'] = $item->wp_tags;
+      $rec['wp_eyechatch_path_org'] = $item->wp_eyechatch_path_org;
+      $rec['post_date'] = $item->post_date;
+      $rec['post_status'] = $item->post_status;
+      $rec['notification_status'] = $item->notification_status;
+      $rec['destinations'] = $item->destinations;
+      
+      $rec['create_date'] = $item->create_date;
+      $rec['modify_date'] = $item->modify_date;
+      $rec['destinations_values'] = $item->destinations_values;
 
-			$data[] = $rec;
-		}
+      $data[] = $rec;
+    }
                 
         
         /**
