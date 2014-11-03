@@ -19,39 +19,43 @@
     If not, see http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-class WPNC_OptionsManager {
+class WPNC_OptionsManager
+{
 
-    public function getOptionNamePrefix() {
-        return get_class($this) . '_';
-    }
+  public function getOptionNamePrefix()
+  {
+    return get_class($this) . '_';
+  }
 
 
-    /**
-     * Define your options meta data here as an array, where each element in the array
-     * @return array of key=>display-name and/or key=>array(display-name, choice1, choice2, ...)
-     * key: an option name for the key (this name will be given a prefix when stored in
-     * the database to ensure it does not conflict with other plugin options)
-     * value: can be one of two things:
-     *   (1) string display name for displaying the name of the option to the user on a web page
-     *   (2) array where the first element is a display name (as above) and the rest of
-     *       the elements are choices of values that the user can select
-     * e.g.
-     * array(
-     *   'item' => 'Item:',             // key => display-name
-     *   'rating' => array(             // key => array ( display-name, choice1, choice2, ...)
-     *       'CanDoOperationX' => array('Can do Operation X', 'Administrator', 'Editor', 'Author', 'Contributor', 'Subscriber'),
-     *       'Rating:', 'Excellent', 'Good', 'Fair', 'Poor')
-     */
-    public function getOptionMetaData() {
-        return array();
-    }
+  /**
+   * Define your options meta data here as an array, where each element in the array
+   * @return array of key=>display-name and/or key=>array(display-name, choice1, choice2, ...)
+   * key: an option name for the key (this name will be given a prefix when stored in
+   * the database to ensure it does not conflict with other plugin options)
+   * value: can be one of two things:
+   *   (1) string display name for displaying the name of the option to the user on a web page
+   *   (2) array where the first element is a display name (as above) and the rest of
+   *       the elements are choices of values that the user can select
+   * e.g.
+   * array(
+   *   'item' => 'Item:',             // key => display-name
+   *   'rating' => array(             // key => array ( display-name, choice1, choice2, ...)
+   *       'CanDoOperationX' => array('Can do Operation X', 'Administrator', 'Editor', 'Author', 'Contributor', 'Subscriber'),
+   *       'Rating:', 'Excellent', 'Good', 'Fair', 'Poor')
+   */
+  public function getOptionMetaData()
+  {
+    return array();
+  }
 
-    /**
-     * @return array of string name of options
-     */
-    public function getOptionNames() {
-        return array_keys($this->getOptionMetaData());
-    }
+  /**
+   * @return array of string name of options
+   */
+  public function getOptionNames()
+  {
+    return array_keys($this->getOptionMetaData());
+  }
 
     /**
      * Override this method to initialize options to default values and save to the database with add_option

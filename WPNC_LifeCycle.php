@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS `{$table_prefix}notifications_in` (
 `wp_postid` bigint(20) unsigned DEFAULT NULL,
 `wp_post_title` text,
 `wp_post_content` longtext,
+`wp_post_meta` longtext DEFAULT NULL,
 `wp_tags` text,
 `wp_eyechatch_path_org` varchar(1024) DEFAULT NULL,
 `wp_eyechatch_path` varchar(1024) DEFAULT NULL,
@@ -134,6 +135,7 @@ CREATE TABLE IF NOT EXISTS `{$table_prefix}notifications_in` (
 `post_status` varchar(20) DEFAULT NULL,
 `notification_status` varchar(20) DEFAULT NULL,
 `description` varchar(1024) DEFAULT NULL,
+`website_from` int(11) DEFAULT NULL,
 `create_date` datetime DEFAULT NULL,
 `modify_date` datetime DEFAULT NULL,
 PRIMARY KEY (`id`)
@@ -147,6 +149,7 @@ CREATE TABLE IF NOT EXISTS `{$table_prefix}notifications_out` (
 `wp_postid` bigint(20) unsigned DEFAULT NULL,
 `wp_post_title` text,
 `wp_post_content` longtext,
+`wp_post_meta` longtext DEFAULT NULL,
 `wp_tags` text,
 `wp_eyechatch_path_org` varchar(1024) DEFAULT NULL,
 `wp_eyechatch_path` varchar(1024) DEFAULT NULL,
