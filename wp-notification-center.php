@@ -49,7 +49,8 @@ function WPNC_noticePhpVersionWrong()
 }
 
 
-function WPNC_PhpVersionCheck() {
+function WPNC_PhpVersionCheck()
+{
     global $WPNC_minimalRequiredPhpVersion;
     if (version_compare(phpversion(), $WPNC_minimalRequiredPhpVersion) < 0) {
         add_action('admin_notices', 'WPNC_noticePhpVersionWrong');
@@ -66,7 +67,8 @@ function WPNC_PhpVersionCheck() {
  *      http://www.wdmac.com/how-to-create-a-po-language-translation#more-631
  * @return void
  */
-function WPNC_i18n_init() {
+function WPNC_i18n_init()
+{
     $pluginDir = dirname(plugin_basename(__FILE__));
     load_plugin_textdomain('wp-notification-center', false, $pluginDir . '/languages/');
 }
@@ -105,27 +107,4 @@ if (WPNC_PhpVersionCheck() && WPNC_check_prefix()) {
     WPNC_init(__FILE__);
 }
 
-/* ----------------------------------------------------------
-	
-	Admin > Add post menu
-	
----------------------------------------------------------- */
-
-add_filter('post_row_actions', 'wpnc_link_row', 10, 2);
-
-function wpnc_link_row($actions, $post)
-{
-	#if (duplicate_post_is_current_user_allowed_to_copy()) {
-		/*
-		$actions['clone'] = '<a href="'.duplicate_post_get_clone_post_link( $post->ID , 'display', false).'" title="'
-		. esc_attr(__("Clone this item", DUPLICATE_POST_I18N_DOMAIN))
-		. '">' .  __('Clone', DUPLICATE_POST_I18N_DOMAIN) . '</a>';
-		*/
-		
-	#}
-	
-	$actions['wpnc'] = '<a>wpnc</a>';
-	
-	return $actions;
-}
 

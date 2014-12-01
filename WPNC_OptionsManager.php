@@ -736,3 +736,138 @@ class WPNC_OptionsManager
 
 }
 
+/* ----------------------------------------------------------
+	
+	Admin > Add post menu
+	
+---------------------------------------------------------- */
+
+function wpnc_link_row($actions, $post)
+{
+	
+	global $post;
+	
+	if (current_user_can('edit_post', $post->ID))
+	{
+	  
+	  $limit = 34;
+	  
+  	$title = mb_substr(strip_tags($post->post_title), 0, $limit);
+  	if (mb_strlen($post->post_title) > $limit) $title .= "…";
+  	
+  	$actions['wpnc'] = '<a href="#TB_inline?inlineId=wpnc_selector&height=450&width=600" title="「'.$title.'」を送信" class="js-trig-wpnc thickbox" data-post-id="'.$post->ID.'">'.__('送信').'</a>';
+  	
+	}
+	
+	return $actions;
+}
+
+add_filter('post_row_actions', 'wpnc_link_row', 10, 2);
+
+function wpnc_render_js()
+{
+
+wp_enqueue_style( 'thickbox' );
+wp_enqueue_script( 'thickbox' );
+
+?>
+
+<script type="text/javascript">
+
+(function($) {
+  
+  $(function() {
+    $('#wpnc_submit').on('click', function() {
+      
+      var f = $('#wpnc_selector_form');
+      
+      event.preventDefault();
+      
+      $.ajax({
+        type: 'POST',
+        url: ajaxurl,
+        data: {
+          action : 'send_notification',
+          post_id: f.attr('data-post-id'),
+          form: f.serialize()
+        },
+        success: function( response ) {
+          alert( response );
+        }
+      });
+      return false;
+      
+    }).css('cursor', 'pointer');
+    
+    $('.js-trig-wpnc').on('click', function() {
+      var post_id = $(this).data('post-id');
+      $('#wpnc_selector_form').attr('data-post-id', post_id);
+    });
+  });
+  
+})(jQuery);
+
+</script>
+
+<?php
+
+$websites = array();
+if ($json_websites = get_option('WPNC_Plugin_Websites', 'none')) $websites = json_decode( $json_websites, true );
+
+?>
+
+<div id="wpnc_selector" style="display:none;">
+	<form id="wpnc_selector_form" data-post-id="">
+		
+		<ul>
+		  <?php foreach($websites as $website):if($website):?><li><input type="checkbox" name="id" value="<?php echo $website['id']?>"> <?php echo $website['name']?></li><?php endif;endforeach?>
+		</ul>
+		
+		<div class="wpnc_submit_field">
+		  <a type="submit" class="button button-primary button-large" id="wpnc_submit"><?php _e('送信')?></a>
+		</div>
+		
+	</form>
+</div>
+
+<div class="fullscreen-overlay" id="fullscreen-overlay"></div>
+<div class="fullscreen-overlay fullscreen-fader fade-600" id="fullscreen-fader"></div>
+
+<?php
+}
+
+add_filter('admin_head', 'wpnc_render_js');
+
+function send_notification()
+{
+  
+  $post_id = null;
+  $form = null;
+  if (isset( $_POST['form'] )) $form = $_POST['form'];
+  if (isset( $_POST['post_id'] )) $post_id = $_POST['post_id'];
+  
+  $ids = array();
+  
+  if ( !$form || !$post_id ) exit('不正なリクエストです');
+  
+  $queries = explode('&', $form);
+  foreach ($queries as $k => $v)
+  {
+    $query = explode('=', $v);
+    if ($query[0] === 'id' && isset($query[1])) $ids[] = (int)$query[1];
+  }
+  
+  if (!$ids) exit('IDを指定してください');
+  
+  require_once('list-table-out.php');
+  $api = new Notifications_Out_List;
+  
+  $return = $api->send_post( $post_id, $ids );
+  
+  exit( isset($return['message']) ? $return['message'] : 'エラーが発生しました' );
+  
+}
+add_action( 'wp_ajax_send_notification', 'send_notification' );
+
+
+

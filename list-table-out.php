@@ -195,7 +195,8 @@ class Notifications_Out_List extends WP_List_Table
     $my_websites = json_decode(get_option('WPNC_Plugin_Websites', 'none'), true);
     $selected_values = explode(',', $in_d_values);
     $output = '<div class="multiselect">';
-    foreach ($my_websites as $website) {
+    foreach ($my_websites as $website)
+    {
       if (is_null($website['id'])) {
         continue;
       }
@@ -505,6 +506,9 @@ class Notifications_Out_List extends WP_List_Table
     
     $api_function = 'ApiNotifications/add.json';
     
+    #echo '<pre>';print_r($in_notification_data);echo '</pre>';exit;
+    #exit("$in_endpoint_uri/$api_function?apikey=$apikey");
+    
     $curl = curl_init("$in_endpoint_uri/$api_function?apikey=$apikey");
     curl_setopt($curl,CURLOPT_POST, TRUE);
     curl_setopt($curl,CURLOPT_POSTFIELDS, $in_notification_data);
@@ -520,6 +524,155 @@ class Notifications_Out_List extends WP_List_Table
     $output = curl_exec($curl);
 
     return $output;
+    
+  }
+  
+  function send_post($post_id = null, $ids = null)
+  {
+    
+    if (!$post_id || !$ids) return false;
+    
+    global $wpdb;
+    $table_prefix = WPNC_PREFIX;
+    
+    $endpoint_uri = get_option('WPNC_Plugin_EndPointURI');
+    $apikey = get_option('WPNC_Plugin_APIKey');
+    
+    if (!$endpoint_uri || !$apikey)
+    {
+      return array(
+        'is_success' => true,
+        'message' => 'EndPoint URIと API Keyを正しく設定して下さい。',
+      );
+    }
+    
+    if (!is_array($ids)) $ids = array($ids);
+    
+    if ($post = get_post($post_id))
+    {
+      
+      /*
+      $id                    = $row->id;
+      $website_id            = $row->website_id;
+      $wp_postid             = $row->wp_postid;
+      $wp_post_title         = $row->wp_post_title;
+      $wp_post_content       = $row->wp_post_content;
+      $wp_tags               = $row->wp_tags;
+      $wp_eyechatch_path_org = $row->wp_eyechatch_path_org;
+      $post_date             = $row->post_date;
+      $post_status           = $row->post_status;
+      $notification_status   = $row->notification_status;
+      $create_date           = $row->create_date;
+      $modify_date           = $row->modify_date;
+      */
+      
+      $postdata = array(
+        
+        'wp_postid' => $post->ID,
+        'wp_post_title' => get_the_title(),
+        'wp_post_content' => $post->post_content,
+        'wp_tags' => '',//TODO: タグを入れる
+        'wp_eyechatch_path_org' => '',//TODO: アイキャッチのパスを入れる
+        'post_date' => $post->post_date,
+        'post_status' => $post->post_status,
+        'notification_status' => 'NEW',//TODO: NEWかUPDATEか
+        
+      );
+      #exit($postdata);
+      
+      foreach( $ids as $id )
+      {
+        
+        $postdata['website_id'] = $id;
+        
+        exit( $this->send_notification($endpoint_uri, $apikey, json_encode( $postdata )) );
+        #error_log( json_encode($postdata) );
+        
+      }
+    }
+    
+    #echo '<pre>';print_r($post);echo '</pre>';exit;
+    
+    
+    
+    
+    
+    /*
+    
+
+    $show_alert = false;
+    
+    foreach ($target_ids as $rec_id)
+    {
+      
+      $query = $wpdb->prepare(
+        "select * from {$table_prefix}notifications_out where id = %s",
+        $rec_id);
+      $row = $wpdb->get_results($query);
+      
+      if (is_null($row))
+      {
+        continue;
+      }
+      error_log(json_encode($row));
+      $row_data = $row[0];
+      /*
+      $id                    = $row->id;
+      $website_id            = $row->website_id;
+      $wp_postid             = $row->wp_postid;
+      $wp_post_title         = $row->wp_post_title;
+      $wp_post_content       = $row->wp_post_content;
+      $wp_tags               = $row->wp_tags;
+      $wp_eyechatch_path_org = $row->wp_eyechatch_path_org;
+      $post_date             = $row->post_date;
+      $post_status           = $row->post_status;
+      $notification_status   = $row->notification_status;
+      $create_date           = $row->create_date;
+      $modify_date           = $row->modify_date;
+       */
+      /*
+      unset($row_data->id);
+
+      // only send records with destinations(s)
+      if (!isset($row_data->destinations_values) || empty($row_data->destinations_values))
+      {
+        $show_alert = true;
+        continue;
+      }
+
+      // data is sent one notification per one destination.
+      $destinations = explode(',', $row_data->destinations_values);
+
+      foreach ($destinations as $website_id)
+      {
+        error_log(json_encode($row_data));
+        $row_data->website_id = $website_id;
+        $notification_data = json_encode($row_data);
+        $send_result = $this->send_notification($endpoint_uri, $apikey, $notification_data);
+        error_log(json_encode($send_result));
+        //s var_dump($send_result);
+      }
+
+      $query = $wpdb->prepare( "delete from {$table_prefix}notifications_out where id = %s", $rec_id);
+      $rows = $wpdb->get_results($query);
+
+    }
+
+    // redirect after deletion
+    // $redirect_to = admin_url('plugins.php?page=WPNC_PluginNotifcationsOut#bulk_send_done');
+    // wp_redirect($redirect_to, 302);
+    // exit;
+
+    if ($show_alert == true)
+    {
+      echo "<div class='error'><p>通知先が設定されていないレコードは送信されませんでした</p></div>";
+    }
+    */
+    
+    return array(
+      'is_success' => true,
+      'message' => '送信完了しました',
+    );
     
   }
 
