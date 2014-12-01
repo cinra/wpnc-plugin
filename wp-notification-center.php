@@ -105,3 +105,27 @@ if (WPNC_PhpVersionCheck() && WPNC_check_prefix()) {
     WPNC_init(__FILE__);
 }
 
+/* ----------------------------------------------------------
+	
+	Admin > Add post menu
+	
+---------------------------------------------------------- */
+
+add_filter('post_row_actions', 'wpnc_link_row', 10, 2);
+
+function wpnc_link_row($actions, $post)
+{
+	#if (duplicate_post_is_current_user_allowed_to_copy()) {
+		/*
+		$actions['clone'] = '<a href="'.duplicate_post_get_clone_post_link( $post->ID , 'display', false).'" title="'
+		. esc_attr(__("Clone this item", DUPLICATE_POST_I18N_DOMAIN))
+		. '">' .  __('Clone', DUPLICATE_POST_I18N_DOMAIN) . '</a>';
+		*/
+		
+	#}
+	
+	$actions['wpnc'] = '<a>wpnc</a>';
+	
+	return $actions;
+}
+
