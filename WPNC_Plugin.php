@@ -14,9 +14,9 @@ class WPNC_Plugin extends WPNC_LifeCycle
     $return_value = array(
       //'_version' => array('Installed Version'), // Leave this one commented-out. Uncomment to test upgrades.
       'EndPointURI'   => array(__('APIエンドポイントURI', 'wpnc-notification-center')),
-      'APIKey'    => array(__('API Key', 'wpnc-notification-center')),
-      'User'      => array(__('割当ユーザ', 'wpnc-notification-center')),
-      'Category'    => array(__('割当カテゴリ', 'wpnc-notification-center')),
+      'APIKey'        => array(__('API Key', 'wpnc-notification-center')),
+      'User'          => array(__('割当ユーザ', 'wpnc-notification-center')),
+      'Category'      => array(__('割当カテゴリ', 'wpnc-notification-center')),
     );
     
     $users = get_users(array());
@@ -181,7 +181,8 @@ class WPNC_Plugin extends WPNC_LifeCycle
   {
     ob_start();
   }
-
+  
+  /*
   public function addNotification($post_ID)
   {
     
@@ -268,6 +269,7 @@ class WPNC_Plugin extends WPNC_LifeCycle
     }
 
   }
+  */
 
   public function ajaxUpdateDestinations()
   {
@@ -339,15 +341,13 @@ class WPNC_Plugin extends WPNC_LifeCycle
     $plugin_url = plugins_url( $path, $plugin );
     $url_notifications_out = "plugins.php?page=WPNC_PluginNotifcationsOut";
     $url_refresh           = admin_url('edit.php?page=WPNC_PluginNotifcationsIn&action=refresh_dashboard');
-
-    echo "<a href='$url_refresh'><button class='button button-primary'>リフレッシュ</button></a>&nbsp;&nbsp;&nbsp;&nbsp;";
-    // Display whatever it is you want to show
-    echo "<a href='edit.php?page=WPNC_PluginNotifcationsIn'>全ての通知(IN)を見る</a><br/>";
-
+    
+    echo '<style type="text/css">#received-posts .more {float:right;}</style>';
+    
     echo $this->wpnc_dashboard_list_notifications_out();
-    echo "<br/><br/>";
-
-    echo "通知(OUT)は<a href='$url_notifications_out'>こちら</a>";
+    
+    echo "<p><a href='$url_refresh'><button class='button button-primary'>記事を受信する</button></a></p>";
+    
     echo "<script type='text/javascript'>function dashboardRefresh() { location.href='".$url_refresh."';} setInterval('dashboardRefresh()',3600000);</script>";
     
   }
@@ -360,23 +360,27 @@ class WPNC_Plugin extends WPNC_LifeCycle
 
   function wpnc_dashboard_list_notifications_out()
   {
+    
     global $wpdb;
     $table_prefix = WPNC_PREFIX;
 
-
-    $query = "SELECT * FROM {$table_prefix}notifications_in order by post_date desc";
-    $rowcount = 0;
+    $query = "SELECT * FROM {$table_prefix}notifications_in order by post_date desc limit 10";
+    
     $rows_html = array();
+    $rows_html[] = '<div id="received-posts" class="activity-block">';
+    $rows_html[] = '<small class="more"><a href="edit.php?page=WPNC_PluginNotifcationsIn">受信記事一覧</a></small>';
+    $rows_html[] = "<h4>受信した記事</h4>";
+    
+    
     $rows_html[] = "<ul>";
     $rows = $wpdb->get_results($query);
-    foreach ($rows as $row) {
-      $rowcount += 1;
-      if (/* is_null($row) || */ $rowcount > 10) {
-        break;
-      }
+    
+    foreach ($rows as $row)
+    {
       $create_date     = $row->create_date;
       $id              = $row->id;
-      $title           = mb_substr($row->wp_post_title,0,10)."...";
+      $title           = mb_substr($row->wp_post_title, 0, 26);
+      if (mb_strlen($row->wp_post_title) > 22) $title .= '…';
       $post_create_url = "edit.php?page=WPNC_PluginNotifcationsIn&action=send&notificationin[]=$id";
       $rows_html[] =<<<EOF
     <li>
@@ -384,9 +388,11 @@ class WPNC_Plugin extends WPNC_LifeCycle
       <a href="$post_create_url">$title</a>
     </li>
 EOF;
+      
     }
 
     $rows_html[] = "</ul>";
+    $rows_html[] = '</div>';
 
     $output = implode("\n",$rows_html);
 

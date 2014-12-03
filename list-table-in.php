@@ -371,39 +371,35 @@ class Notifications_In_List extends WP_List_Table
 
   function process_bulk_createpost($in_target_ids)
   {
+    
     global $wpdb;
 
-    if (!is_array($in_target_ids)) {
-      $in_target_ids = array($in_target_ids);
-    }
+    if (!is_array($in_target_ids)) $in_target_ids = array($in_target_ids);
 
     $endpoint_uri = get_option('WPNC_Plugin_EndPointURI', 'none');
     $apikey = get_option('WPNC_Plugin_APIKey', 'none');
-    if ($endpoint_uri == 'none' || $apikey == 'none') {
+    if ($endpoint_uri == 'none' || $apikey == 'none')
+    {
       echo "EndPoint URIと API Keyを正しく設定して下さい.<br>";
     }
 
     $assigned_user_id = get_option('WPNC_Plugin_User');
     $assigned_category = get_option('WPNC_Plugin_Category');
-
-/*
-    echo "EndPointURI = $endpoint_uri<br>";
-    echo "APIKey = $apikey<br>";
-
-    echo "User ID = $assigned_user_id<br>";
-    echo "Category = $assigned_category<br>";
-*/
-    foreach ($in_target_ids as $rec_id) {
+    
+    foreach ($in_target_ids as $rec_id)
+    {
       $result = $this->create_post_from_notification($rec_id);
     }
 
     // redirect after creation
-    if ($result != 0) {
+    if ($result != 0)
+    {
       wp_redirect(admin_url("/post.php?post=$result&action=edit"), 302);
       exit;
     }
 
     return null;
+    
   }
 
   function process_refresh()
@@ -423,24 +419,28 @@ class Notifications_In_List extends WP_List_Table
     
   }
 
-  function create_post_from_notification($in_notofication_id) {
+  function create_post_from_notification($in_notofication_id)
+  {
+    
     global $wpdb;
     $table_prefix = WPNC_PREFIX;
-
+    
     $query = $wpdb->prepare(
       "select * from {$table_prefix}notifications_in where id = %s",
       $in_notofication_id);
     $rows = $wpdb->get_results($query);
-    if (is_null($rows)) {
-      return 0;
-    }
+    
+    if (is_null($rows)) return 0;
+    
     $row = $rows[0];
+    
     $id                    = $row->id;
     $website_id            = $row->website_id;
     $wp_postid             = $row->wp_postid;
     $wp_post_title         = $row->wp_post_title;
     $wp_post_content       = $row->wp_post_content;
     $wp_tags               = $row->wp_tags;
+    $wp_meta               = $row->wp_post_meta;
     $wp_eyechatch_path_org = $row->wp_eyechatch_path_org;
     $post_date             = $row->post_date;
     $post_status           = $row->post_status;
@@ -469,9 +469,7 @@ class Notifications_In_List extends WP_List_Table
     else
     {
 
-      // handling thumbnails
-      // SEE: http://wordpress.stackexchange.com/questions/40301/how-do-i-set-a-featured-image-thumbnail-by-image-url-when-using-wp-insert-post
-
+      // Eyecatch
       if (!is_null($wp_eyechatch_path_org))
       {
         
@@ -489,7 +487,6 @@ class Notifications_In_List extends WP_List_Table
         }
         
         file_put_contents($file, $image_data);
-
         $wp_filetype = wp_check_filetype($filename, null );
         $attachment = array(
           'post_mime_type' => $wp_filetype['type'],
@@ -502,14 +499,26 @@ class Notifications_In_List extends WP_List_Table
         $attach_data = wp_generate_attachment_metadata( $attach_id, $file );
         wp_update_attachment_metadata( $attach_id, $attach_data );
         set_post_thumbnail( $post_id, $attach_id );
-
-        // handling tags
-        if (strlen($wp_tags) > 0)
+        
+      }
+      
+      // Meta
+      $metadata = json_decode($wp_meta);
+      if (count($metadata) > 0)
+      {
+        foreach ($metadata as $k => $v)
         {
-          wp_set_post_tags( $post_id, $wp_tags, true);
+          if (!in_array($k, array('_edit_last', '_edit_lock', '_thumbnail_id'))) update_post_meta($post_id, $k, $v);
         }
       }
-
+      
+      // Tags
+      $tags = json_decode($wp_tags);
+      if (count($wp_tags) > 0)
+      {
+        wp_set_post_tags( $post_id, $tags, true);
+      }
+      
       $query = $wpdb->prepare(
         "delete from {$table_prefix}notifications_in where id = %s",
         $in_notofication_id);
@@ -523,6 +532,7 @@ class Notifications_In_List extends WP_List_Table
 
   function fetch_notifications($in_endpoint_uri, $apikey)
   {
+    
     $api_function = 'ApiNotifications';
     
     /*$curl = curl_init("$in_endpoint_uri/$api_function?apikey=$apikey");
@@ -553,6 +563,8 @@ class Notifications_In_List extends WP_List_Table
 
     global $wpdb;
     $table_prefix = WPNC_PREFIX;
+    
+    #echo '<pre>';print_r($output_json['result']);echo '</pre>';exit;
 
     foreach ($output_json['result'] as $notification)
     {
@@ -578,25 +590,27 @@ class Notifications_In_List extends WP_List_Table
       $wp_post_title         = $data['wp_post_title'];
       $wp_post_content       = $data['wp_post_content'];
       $wp_tags               = $data['wp_tags'];
+      $wp_meta               = $data['post_meta'];
       $wp_eyechatch_path_org = $data['wp_eyechatch_path_org'];
       $post_date             = $data['post_date'];
       $post_status           = $data['post_status'];
       $notification_status   = $data['notification_status'];
+      $org_website_id        = $data['org_website_id'];
       $create_date           = $data['create_date'];
       $modify_date           = $data['modify_date'];
 
       if ($is_exist > 0)
       {
         $query_u = $wpdb->prepare(
-          "update {$table_prefix}notifications_in set wp_post_title = %s, wp_post_content = %s, wp_tags = %s, wp_eyechatch_path_org = %s, post_date = %s, post_status = %s, notification_status = %s, modify_date = %s where wp_postid = %s and website_id = %s",
-        $wp_post_title, $wp_post_content, $wp_tags, $wp_eyechatch_path_org, $post_date, $post_status, $notification_status, $modify_date, $wp_postid, $website_id);
+          "update {$table_prefix}notifications_in set wp_post_title = %s, wp_post_content = %s, wp_tags = %s, wp_eyechatch_path_org = %s, post_date = %s, post_status = %s, notification_status = %s, modify_date = %s where wp_postid = %s, website_id = %s, org_website_id = %s, wp_post_meta = %s",
+        $wp_post_title, $wp_post_content, $wp_tags, $wp_eyechatch_path_org, $post_date, $post_status, $notification_status, $modify_date, $wp_postid, $website_id, $org_website_id, $wp_meta);
         $wpdb->query($query_u);
       }
       else
       {
         $query_i = $wpdb->prepare(
-          "insert into {$table_prefix}notifications_in set wp_postid = %s, website_id = %s, wp_post_title = %s, wp_post_content = %s, wp_tags = %s, wp_eyechatch_path_org = %s, post_date = %s, post_status = %s, notification_status = %s, create_date = %s, modify_date = %s",
-        $wp_postid, $website_id, $wp_post_title, $wp_post_content, $wp_tags, $wp_eyechatch_path_org, $post_date, $post_status, $notification_status, $create_date, $modify_date);
+          "insert into {$table_prefix}notifications_in set wp_postid = %s, website_id = %s, wp_post_title = %s, wp_post_content = %s, wp_tags = %s, wp_eyechatch_path_org = %s, post_date = %s, post_status = %s, notification_status = %s, create_date = %s, modify_date = %s, org_website_id = %s, wp_post_meta = %s",
+        $wp_postid, $website_id, $wp_post_title, $wp_post_content, $wp_tags, $wp_eyechatch_path_org, $post_date, $post_status, $notification_status, $create_date, $modify_date, $org_website_id, $wp_meta);
         $wpdb->query($query_i);
       }
 

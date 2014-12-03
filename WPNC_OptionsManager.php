@@ -27,7 +27,6 @@ class WPNC_OptionsManager
     return get_class($this) . '_';
   }
 
-
   /**
    * Define your options meta data here as an array, where each element in the array
    * @return array of key=>display-name and/or key=>array(display-name, choice1, choice2, ...)
@@ -57,33 +56,38 @@ class WPNC_OptionsManager
     return array_keys($this->getOptionMetaData());
   }
 
-    /**
-     * Override this method to initialize options to default values and save to the database with add_option
-     * @return void
-     */
-    protected function initOptions() {
-    }
+  /**
+   * Override this method to initialize options to default values and save to the database with add_option
+   * @return void
+   */
+  protected function initOptions()
+  {
+  }
 
-    /**
-     * Cleanup: remove all options from the DB
-     * @return void
-     */
-    protected function deleteSavedOptions() {
-        $optionMetaData = $this->getOptionMetaData();
-        if (is_array($optionMetaData)) {
-            foreach ($optionMetaData as $aOptionKey => $aOptionMeta) {
-                $prefixedOptionName = $this->prefix($aOptionKey); // how it is stored in DB
-                delete_option($prefixedOptionName);
-            }
-        }
+  /**
+   * Cleanup: remove all options from the DB
+   * @return void
+   */
+  protected function deleteSavedOptions()
+  {
+    $optionMetaData = $this->getOptionMetaData();
+    if (is_array($optionMetaData))
+    {
+      foreach ($optionMetaData as $aOptionKey => $aOptionMeta)
+      {
+        $prefixedOptionName = $this->prefix($aOptionKey); // how it is stored in DB
+        delete_option($prefixedOptionName);
+      }
     }
+  }
 
     /**
      * @return string display name of the plugin to show as a name/title in HTML.
      * Just returns the class name. Override this method to return something more readable
      */
-    public function getPluginDisplayName() {
-        return get_class($this);
+    public function getPluginDisplayName()
+    {
+      return get_class($this);
     }
 
     /**
@@ -92,12 +96,14 @@ class WPNC_OptionsManager
      * @param  $name string option name to prefix. Defined in settings.php and set as keys of $this->optionMetaData
      * @return string
      */
-    public function prefix($name) {
-        $optionNamePrefix = $this->getOptionNamePrefix();
-        if (strpos($name, $optionNamePrefix) === 0) { // 0 but not false
-            return $name; // already prefixed
-        }
-        return $optionNamePrefix . $name;
+    public function prefix($name)
+    {
+      $optionNamePrefix = $this->getOptionNamePrefix();
+      if (strpos($name, $optionNamePrefix) === 0)
+      { // 0 but not false
+        return $name; // already prefixed
+      }
+      return $optionNamePrefix . $name;
     }
 
     /**
@@ -106,7 +112,8 @@ class WPNC_OptionsManager
      * @param  $name string
      * @return string $optionName without the prefix.
      */
-    public function &unPrefix($name) {
+    public function &unPrefix($name)
+    {
         $optionNamePrefix = $this->getOptionNamePrefix();
         if (strpos($name, $optionNamePrefix) === 0) {
             return substr($name, strlen($optionNamePrefix));
@@ -122,7 +129,8 @@ class WPNC_OptionsManager
      * @return string the value from delegated call to get_option(), or optional default value
      * if option is not set.
      */
-    public function getOption($optionName, $default = null) {
+    public function getOption($optionName, $default = null)
+    {
         $prefixedOptionName = $this->prefix($optionName); // how it is stored in DB
         $retVal = get_option($prefixedOptionName);
         if (!$retVal && $default) {
@@ -268,32 +276,35 @@ class WPNC_OptionsManager
      */
     public function settingsPage()
     {
-
+      #exit('UUUUU');
       if (!current_user_can('publish_posts')) wp_die(__('You do not have sufficient permissions to access this page.', 'wp-notification-center'));
   
       $optionMetaData = $this->getOptionMetaData();
 
-  		// Destinatios (websites) are automatically updated.
+  		// Destinations (websites) are automatically updated.
   		
   		$websites = $this->acquire_websites();
-  		
+  		#echo '<pre>';print_r($websites);echo '</pre>';exit;
   		$my_site_id = $this->getMySiteID($websites);
     
   		#var_dump($websites);
   		$this->updateOption('Websites', $websites);
   		$my_websites = get_option('WPNC_Plugin_Websites', 'none');
-  
+      
   		$this->updateOption('MySiteID', $my_site_id);
 
 
-        // Save Posted Options
-        if ($optionMetaData != null) {
-            foreach ($optionMetaData as $aOptionKey => $aOptionMeta) {
-                if (isset($_POST[$aOptionKey])) {
-                    $this->updateOption($aOptionKey, $_POST[$aOptionKey]);
-                }
-            }
-        }
+      // Save Posted Options
+      if ($optionMetaData != null)
+      {
+          foreach ($optionMetaData as $aOptionKey => $aOptionMeta)
+          {
+              if (isset($_POST[$aOptionKey]))
+              {
+                  $this->updateOption($aOptionKey, $_POST[$aOptionKey]);
+              }
+          }
+      }
 
         // HTML for the page
         $settingsGroup = get_class($this) . '-settings-group';
@@ -353,7 +364,6 @@ class WPNC_OptionsManager
                 </p>
 
             </form>
-			<?php /* echo $my_websites; echo "  TODO: Destinations needs to be added"; */ ?>
         </div>
         <?php
 
@@ -366,36 +376,37 @@ class WPNC_OptionsManager
      * @param  $savedOptionValue string current value for $aOptionKey
      * @return void
      */
-    protected function createFormControl($aOptionKey, $aOptionMeta, $savedOptionValue) {
-        if (is_array($aOptionMeta) && count($aOptionMeta) >= 2) { // Drop-down list
-            $choices = array_slice($aOptionMeta, 1);
-            ?>
-            <p><select name="<?php echo $aOptionKey ?>" id="<?php echo $aOptionKey ?>">
-            <?php
-                            foreach ($choices as $aChoice) {
-								$aChoice_is_array = false;
-								if (is_array($aChoice)) {
-									$aChoice_is_array = true;
-									$selected = ($aChoice['value'] == $savedOptionValue) ? 'selected' : '';
-								} else {
-									$selected = ($aChoice == $savedOptionValue) ? 'selected' : '';
-								}
-                ?>
-                    <option value="<?php if ($aChoice_is_array) { echo $aChoice['value']; } else { echo $aChoice; } ?>" <?php echo $selected ?>><?php if($aChoice_is_array) { echo $this->getOptionValueI18nString($aChoice['name']); } else { echo $this->getOptionValueI18nString($aChoice); } ?></option>
-                <?php
-            }
-            ?>
-            </select></p>
-            <?php
+    protected function createFormControl($aOptionKey, $aOptionMeta, $savedOptionValue)
+    {
+      if (is_array($aOptionMeta) && count($aOptionMeta) >= 2)
+      { // Drop-down list
+          $choices = array_slice($aOptionMeta, 1);
+          ?>
+          <p><select name="<?php echo $aOptionKey ?>" id="<?php echo $aOptionKey ?>">
+          <?php
+                          foreach ($choices as $aChoice) {
+							$aChoice_is_array = false;
+							if (is_array($aChoice)) {
+								$aChoice_is_array = true;
+								$selected = ($aChoice['value'] == $savedOptionValue) ? 'selected' : '';
+							} else {
+								$selected = ($aChoice == $savedOptionValue) ? 'selected' : '';
+							}
+              ?>
+                  <option value="<?php if ($aChoice_is_array) { echo $aChoice['value']; } else { echo $aChoice; } ?>" <?php echo $selected ?>><?php if($aChoice_is_array) { echo $this->getOptionValueI18nString($aChoice['name']); } else { echo $this->getOptionValueI18nString($aChoice); } ?></option>
+              <?php
+          }
+          ?>
+          </select></p>
+          <?php
 
-        }
-        else { // Simple input field
-            ?>
-            <p><input type="text" name="<?php echo $aOptionKey ?>" id="<?php echo $aOptionKey ?>"
-                      value="<?php echo esc_attr($savedOptionValue) ?>" size="50"/></p>
-            <?php
+      }
+      else { // Simple input field
+          ?>
+          <p><input type="text" name="<?php echo $aOptionKey ?>" id="<?php echo $aOptionKey ?>" value="<?php echo esc_attr($savedOptionValue) ?>" size="50"/></p>
+          <?php
 
-        }
+      }
     }
 
     /**
@@ -412,7 +423,8 @@ class WPNC_OptionsManager
      * @param  $optionValue string
      * @return string __($optionValue) if it is listed in this method, otherwise just returns $optionValue
      */
-    protected function getOptionValueI18nString($optionValue) {
+    protected function getOptionValueI18nString($optionValue)
+    {
         switch ($optionValue) {
             case 'true':
                 return __('true', 'wp-notification-center');
@@ -755,7 +767,7 @@ function wpnc_link_row($actions, $post)
   	$title = mb_substr(strip_tags($post->post_title), 0, $limit);
   	if (mb_strlen($post->post_title) > $limit) $title .= "…";
   	
-  	$actions['wpnc'] = '<a href="#TB_inline?inlineId=wpnc_selector&height=450&width=600" title="「'.$title.'」を送信" class="js-trig-wpnc thickbox" data-post-id="'.$post->ID.'">'.__('送信').'</a>';
+  	$actions['wpnc'] = '<a href="edit.php#TB_inline?inlineId=wpnc_selector&height=450&width=600" title="「'.$title.'」を送信" class="js-trig-wpnc thickbox" data-post-id="'.$post->ID.'">'.__('送信').'</a>';
   	
 	}
 	
@@ -772,6 +784,20 @@ wp_enqueue_script( 'thickbox' );
 
 ?>
 
+<style type="text/css">
+
+#wpnc_notification .container {
+  padding: 12px;
+  margin:10px 0 15px;
+  border:2px solid #e61919;
+}
+
+#wpnc_notification.is_success .container {
+  border:2px solid #7ad03a;
+}
+
+</style>
+
 <script type="text/javascript">
 
 (function($) {
@@ -786,13 +812,27 @@ wp_enqueue_script( 'thickbox' );
       $.ajax({
         type: 'POST',
         url: ajaxurl,
+        dataType: 'json',
         data: {
           action : 'send_notification',
           post_id: f.attr('data-post-id'),
           form: f.serialize()
         },
-        success: function( response ) {
-          alert( response );
+        success: function( res ) {
+          var notice = $('#wpnc_notification');
+          notice.html('<div class="container">' + res.message + '</div>');
+          if (res.is_success)
+          {
+            $('#wpnc_submit').fadeOut();
+            notice.addClass('is_success');
+          }
+          else
+          {
+            notice.removeClass('is_success');
+            setTimeout(function() {
+              notice.find('.container').fadeOut();
+            }, 3000);
+          }
         }
       });
       return false;
@@ -802,6 +842,8 @@ wp_enqueue_script( 'thickbox' );
     $('.js-trig-wpnc').on('click', function() {
       var post_id = $(this).data('post-id');
       $('#wpnc_selector_form').attr('data-post-id', post_id);
+      $('#wpnc_notification').html('');
+      $('#wpnc_submit').show();
     });
   });
   
@@ -814,9 +856,10 @@ wp_enqueue_script( 'thickbox' );
 $websites = array();
 if ($json_websites = get_option('WPNC_Plugin_Websites', 'none')) $websites = json_decode( $json_websites, true );
 
-?>
+if (!empty($websites)):?>
 
 <div id="wpnc_selector" style="display:none;">
+	<div id="wpnc_notification"></div>
 	<form id="wpnc_selector_form" data-post-id="">
 		
 		<ul>
@@ -834,6 +877,8 @@ if ($json_websites = get_option('WPNC_Plugin_Websites', 'none')) $websites = jso
 <div class="fullscreen-overlay fullscreen-fader fade-600" id="fullscreen-fader"></div>
 
 <?php
+endif;
+
 }
 
 add_filter('admin_head', 'wpnc_render_js');
@@ -848,7 +893,13 @@ function send_notification()
   
   $ids = array();
   
-  if ( !$form || !$post_id ) exit('不正なリクエストです');
+  if ( !$form || !$post_id )
+  {
+    exit( json_encode( array(
+      'is_success' => false,
+      'message' => '不正なリクエストです',
+    )) );
+  }
   
   $queries = explode('&', $form);
   foreach ($queries as $k => $v)
@@ -857,14 +908,18 @@ function send_notification()
     if ($query[0] === 'id' && isset($query[1])) $ids[] = (int)$query[1];
   }
   
-  if (!$ids) exit('IDを指定してください');
+  if (!$ids)
+  {
+    exit( json_encode( array(
+      'is_success' => false,
+      'message' => 'IDを指定してください',
+    )) );
+  }
   
   require_once('list-table-out.php');
   $api = new Notifications_Out_List;
   
-  $return = $api->send_post( $post_id, $ids );
-  
-  exit( isset($return['message']) ? $return['message'] : 'エラーが発生しました' );
+  exit( json_encode($api->send_post( $post_id, $ids )) );
   
 }
 add_action( 'wp_ajax_send_notification', 'send_notification' );

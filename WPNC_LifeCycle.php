@@ -75,7 +75,11 @@ class WPNC_LifeCycle extends WPNC_InstallIndicator
    * See: http://plugin.michael-simpson.com/?page_id=105
    * @return void
    */
-  public function deactivate() {}
+  public function deactivate() {
+    
+    $this->unInstallDatabaseTables();//TODO: 落ち着いたら取る
+    
+  }
 
   /**
    * See: http://plugin.michael-simpson.com/?page_id=31
@@ -135,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `{$table_prefix}notifications_in` (
 `post_status` varchar(20) DEFAULT NULL,
 `notification_status` varchar(20) DEFAULT NULL,
 `description` varchar(1024) DEFAULT NULL,
-`website_from` int(11) DEFAULT NULL,
+`org_website_id` int(11) DEFAULT NULL,
 `create_date` datetime DEFAULT NULL,
 `modify_date` datetime DEFAULT NULL,
 PRIMARY KEY (`id`)
@@ -176,7 +180,18 @@ EOF;
    * Drop plugin-created tables on uninstall.
    * @return void
    */
-  protected function unInstallDatabaseTables() {
+  protected function unInstallDatabaseTables() 
+  {
+    
+    global $wpdb;
+  	$table_prefix = WPNC_PREFIX;
+  	#exit('UUUUU');
+  	$sql1 = "DROP TABLE IF EXISTS `{$table_prefix}notifications_in`";
+    $sql2 = "DROP TABLE IF EXISTS `{$table_prefix}notifications_out`";
+
+  	$wpdb->query($sql1);
+  	$wpdb->query($sql2);
+    
   }
 
   /**
@@ -289,6 +304,7 @@ EOF;
 
   protected function addNotificationsOutToSubMenuPage()
   {
+    /*
     $this->requireExtraPluginFiles();
     $displayName = "投稿を送信";
     add_submenu_page('edit.php',
@@ -297,6 +313,7 @@ EOF;
                      'publish_posts',
                      $this->getNotificationsOutSlug(),
                      array(&$this, 'notificationsOutPage'));
+    */
   }
 
   protected function addNotificationsInToSubMenuPage()
